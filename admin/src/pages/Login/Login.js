@@ -1,164 +1,185 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { HiMail, HiLockClosed, HiExclamationCircle } from 'react-icons/hi';
+import { BsCheckCircleFill } from 'react-icons/bs';
+import { AiFillThunderbolt } from 'react-icons/ai';
 import './Login.css';
+import BugCircleLogo from '../../assets/TexionixLogo.png';
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'Admin'
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const { login, register, admin } = useAuth();
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (admin) {
-      navigate('/');
-    }
-  }, [admin, navigate]);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError('');
-  };
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    if (isLogin) {
-      const result = await login(formData.email, formData.password);
-      if (result.success) {
-        navigate('/');
-      } else {
-        setError(result.message);
-      }
+    if (!email || !password) {
+      setError('Please enter email and password');
+      setLoading(false);
+      return;
+    }
+
+    if (email === 'admin@telexph.com' && password === 'admin123') {
+      localStorage.setItem('adminToken', 'demo-token-12345');
+      localStorage.setItem('adminData', JSON.stringify({
+        email: email,
+        name: 'Kawander',
+        role: 'Developer'
+      }));
+      navigate('/admin/dashboard');
     } else {
-      if (!formData.name || !formData.email || !formData.password) {
-        setError('Please fill in all fields');
-        setLoading(false);
-        return;
-      }
-      
-      const result = await register(
-        formData.name, 
-        formData.email, 
-        formData.password, 
-        formData.role
-      );
-      
-      if (result.success) {
-        navigate('/');
-      } else {
-        setError(result.message);
-      }
+      setError('Invalid email or password');
     }
 
     setLoading(false);
   };
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setError('');
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      role: 'Admin'
-    });
-  };
-
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>🐛 Bug Reporter</h1>
-          <p>{isLogin ? 'Admin Login' : 'Create Admin Account'}</p>
+    <div className="login-page">
+      {/* Animated Background Shapes */}
+      <div className="bg-shapes">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
+
+      <div className="login-card-wrapper">
+        {/* Left Side - Branding Text Only */}
+        <div className="login-left">
+          <div className="brand-content">
+            <div className="branding-text">
+              <h1 className="system-title">Bug Reporting System</h1>
+              <p className="system-tagline">Audit & Compliance Division</p>
+            </div>
+
+            <h3 className="welcome-text">Welcome Back, Admin!</h3>
+            <p className="welcome-subtitle">
+              Manage bug reports efficiently with real-time tracking and comprehensive analytics.
+            </p>
+
+            <div className="features-list">
+              <div className="feature-item">
+                <span className="check-icon">
+                  <BsCheckCircleFill size={20} />
+                </span>
+                <span>Real-time bug tracking</span>
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">
+                  <BsCheckCircleFill size={20} />
+                </span>
+                <span>Email integration</span>
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">
+                  <BsCheckCircleFill size={20} />
+                </span>
+                <span>Team collaboration</span>
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">
+                  <BsCheckCircleFill size={20} />
+                </span>
+                <span>Priority management</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="name">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-                required={!isLogin}
+        {/* Right Side - Login Form with Circle Logo */}
+        <div className="login-right">
+          <div className="login-form-container">
+            {/* Circle Bug Logo at Top */}
+            <div className="logo-container">
+              <img 
+                src={BugCircleLogo} 
+                alt="Bug Reporting Logo" 
+                className="circle-bug-logo"
               />
             </div>
-          )}
 
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="role">Role</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="Admin">Admin</option>
-                <option value="Developer">Developer</option>
-                <option value="QA">QA</option>
-                <option value="Super Admin">Super Admin</option>
-              </select>
+            <div className="login-form-header">
+              <h2>Admin Login</h2>
+              <p>Enter your credentials to access the dashboard</p>
             </div>
-          )}
 
-          {error && <div className="error-message">{error}</div>}
+            <form onSubmit={handleLogin} className="login-form">
+              {error && (
+                <div className="error-message">
+                  <HiExclamationCircle size={18} />
+                  {error}
+                </div>
+              )}
 
-          <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Register')}
-          </button>
-        </form>
+              <div className="form-group">
+                <label htmlFor="email">Email Address</label>
+                <div className="input-wrapper">
+                  <span className="input-icon">
+                    <HiMail size={20} />
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@telexph.com"
+                    disabled={loading}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
 
-        <div className="toggle-mode">
-          <p>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button type="button" onClick={toggleMode} className="toggle-btn">
-              {isLogin ? 'Register here' : 'Login here'}
-            </button>
-          </p>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <div className="input-wrapper">
+                  <span className="input-icon">
+                    <HiLockClosed size={20} />
+                  </span>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    disabled={loading}
+                    autoComplete="current-password"
+                  />
+                </div>
+              </div>
+
+              <div className="form-options">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span>Remember me for 30 days</span>
+                </label>
+                <a href="#forgot" className="forgot-link">Forgot password?</a>
+              </div>
+
+              <button type="submit" className="login-submit-btn" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    Login to Dashboard
+                    <AiFillThunderbolt size={18} />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

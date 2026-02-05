@@ -1,41 +1,75 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import PrivateRoute from './components/PrivateRoute';
-
-// Pages
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard/Dashboard';
+import BugDetails from './pages/BugDetails/BugDetails';
 import Login from './pages/Login/Login';
-import Dashboard from './pages/Dashboard';
-import BugList from './pages/BugList';
-import BugDetails from './pages/BugDetails';
-import CreateBug from './pages/CreateBug';
-import AdminManagement from './pages/AdminManagement';
-
-// Styles
+import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/bugs" element={<PrivateRoute><BugList /></PrivateRoute>} />
-            <Route path="/bugs/:id" element={<PrivateRoute><BugDetails /></PrivateRoute>} />
-            <Route path="/bugs/create" element={<PrivateRoute><CreateBug /></PrivateRoute>} />
-            <Route path="/admins" element={<PrivateRoute><AdminManagement /></PrivateRoute>} />
-            
-            {/* Redirect unknown routes */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        {/* Redirect root to /admin/login */}
+        <Route path="/" element={<Navigate to="/admin/login" replace />} />
+        
+        {/* Redirect /admin to /admin/login */}
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+
+        {/* Login Route (No Layout) */}
+        <Route path="/admin/login" element={<Login />} />
+
+        {/* Protected Routes (With Layout) */}
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <PrivateRoute>
+              <Layout><Dashboard /></Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/bug-list" 
+          element={
+            <PrivateRoute>
+              <Layout><div style={{padding: '2rem'}}>Bug List - Coming Soon</div></Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/bug-details/:id" 
+          element={
+            <PrivateRoute>
+              <Layout><BugDetails /></Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/create-bug" 
+          element={
+            <PrivateRoute>
+              <Layout><div style={{padding: '2rem'}}>Create Bug - Coming Soon</div></Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/settings" 
+          element={
+            <PrivateRoute>
+              <Layout><div style={{padding: '2rem'}}>Settings - Coming Soon</div></Layout>
+            </PrivateRoute>
+          } 
+        />
+
+        {/* Catch all - redirect to login */}
+        <Route path="*" element={<Navigate to="/admin/login" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
