@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Layout from '../components/Layout';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -55,161 +54,157 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Loading dashboard...</p>
-        </div>
-      </Layout>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="dashboard">
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">🐛</div>
-            <div className="stat-content">
-              <h3>Total Bugs</h3>
-              <p className="stat-number">{stats?.total || 0}</p>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: '#fee2e2', color: '#dc2626' }}>🔴</div>
-            <div className="stat-content">
-              <h3>Open</h3>
-              <p className="stat-number">{stats?.byStatus.open || 0}</p>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: '#fef3c7', color: '#f59e0b' }}>⚡</div>
-            <div className="stat-content">
-              <h3>In Progress</h3>
-              <p className="stat-number">{stats?.byStatus.inProgress || 0}</p>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: '#d1fae5', color: '#10b981' }}>✅</div>
-            <div className="stat-content">
-              <h3>Resolved</h3>
-              <p className="stat-number">{stats?.byStatus.resolved || 0}</p>
-            </div>
+    <div className="dashboard">
+      {/* Stats Cards */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon">🐛</div>
+          <div className="stat-content">
+            <h3>Total Bugs</h3>
+            <p className="stat-number">{stats?.total || 0}</p>
           </div>
         </div>
 
-        {/* Severity Distribution */}
-        <div className="section-card">
-          <h2 className="section-title">Severity Distribution</h2>
-          <div className="severity-bars">
-            <div className="severity-bar">
-              <div className="severity-label">
-                <span>Critical</span>
-                <span className="severity-count">{stats?.bySeverity.critical || 0}</span>
-              </div>
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill severity-critical-fill" 
-                  style={{ width: `${(stats?.bySeverity.critical / stats?.total * 100) || 0}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="severity-bar">
-              <div className="severity-label">
-                <span>High</span>
-                <span className="severity-count">{stats?.bySeverity.high || 0}</span>
-              </div>
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill severity-high-fill" 
-                  style={{ width: `${(stats?.bySeverity.high / stats?.total * 100) || 0}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="severity-bar">
-              <div className="severity-label">
-                <span>Medium</span>
-                <span className="severity-count">{stats?.bySeverity.medium || 0}</span>
-              </div>
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill severity-medium-fill" 
-                  style={{ width: `${(stats?.bySeverity.medium / stats?.total * 100) || 0}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="severity-bar">
-              <div className="severity-label">
-                <span>Low</span>
-                <span className="severity-count">{stats?.bySeverity.low || 0}</span>
-              </div>
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill severity-low-fill" 
-                  style={{ width: `${(stats?.bySeverity.low / stats?.total * 100) || 0}%` }}
-                ></div>
-              </div>
-            </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: '#fee2e2', color: '#dc2626' }}>🔴</div>
+          <div className="stat-content">
+            <h3>Open</h3>
+            <p className="stat-number">{stats?.byStatus?.open || 0}</p>
           </div>
         </div>
 
-        {/* Recent Bugs */}
-        <div className="section-card">
-          <div className="section-header">
-            <h2 className="section-title">Recent Bugs</h2>
-            <Link to="/bugs" className="view-all-link">View All →</Link>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: '#fef3c7', color: '#f59e0b' }}>⚡</div>
+          <div className="stat-content">
+            <h3>In Progress</h3>
+            <p className="stat-number">{stats?.byStatus?.inProgress || 0}</p>
           </div>
-          
-          {recentBugs.length === 0 ? (
-            <p className="no-data">No bugs reported yet</p>
-          ) : (
-            <div className="bugs-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Severity</th>
-                    <th>Status</th>
-                    <th>Reported By</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentBugs.map((bug) => (
-                    <tr key={bug._id}>
-                      <td>
-                        <Link to={`/bugs/${bug._id}`} className="bug-title-link">
-                          {bug.title}
-                        </Link>
-                      </td>
-                      <td>
-                        <span className={`badge ${getSeverityClass(bug.severity)}`}>
-                          {bug.severity}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge ${getStatusClass(bug.status)}`}>
-                          {bug.status}
-                        </span>
-                      </td>
-                      <td>{bug.reportedBy.name}</td>
-                      <td>{new Date(bug.createdAt).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: '#d1fae5', color: '#10b981' }}>✅</div>
+          <div className="stat-content">
+            <h3>Resolved</h3>
+            <p className="stat-number">{stats?.byStatus?.resolved || 0}</p>
+          </div>
         </div>
       </div>
-    </Layout>
+
+      {/* Severity Distribution */}
+      <div className="section-card">
+        <h2 className="section-title">Severity Distribution</h2>
+        <div className="severity-bars">
+          <div className="severity-bar">
+            <div className="severity-label">
+              <span>Critical</span>
+              <span className="severity-count">{stats?.bySeverity?.critical || 0}</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill severity-critical-fill" 
+                style={{ width: `${(stats?.bySeverity?.critical / stats?.total * 100) || 0}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="severity-bar">
+            <div className="severity-label">
+              <span>High</span>
+              <span className="severity-count">{stats?.bySeverity?.high || 0}</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill severity-high-fill" 
+                style={{ width: `${(stats?.bySeverity?.high / stats?.total * 100) || 0}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="severity-bar">
+            <div className="severity-label">
+              <span>Medium</span>
+              <span className="severity-count">{stats?.bySeverity?.medium || 0}</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill severity-medium-fill" 
+                style={{ width: `${(stats?.bySeverity?.medium / stats?.total * 100) || 0}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="severity-bar">
+            <div className="severity-label">
+              <span>Low</span>
+              <span className="severity-count">{stats?.bySeverity?.low || 0}</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill severity-low-fill" 
+                style={{ width: `${(stats?.bySeverity?.low / stats?.total * 100) || 0}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Bugs */}
+      <div className="section-card">
+        <div className="section-header">
+          <h2 className="section-title">Recent Bugs</h2>
+          <Link to="/bug-list" className="view-all-link">View All →</Link>
+        </div>
+        
+        {recentBugs.length === 0 ? (
+          <p className="no-data">No bugs reported yet</p>
+        ) : (
+          <div className="bugs-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Reported By</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentBugs.map((bug) => (
+                  <tr key={bug._id}>
+                    <td>
+                      <Link to={`/bug-details/${bug._id}`} className="bug-title-link">
+                        {bug.title}
+                      </Link>
+                    </td>
+                    <td>
+                      <span className={`badge ${getSeverityClass(bug.severity)}`}>
+                        {bug.severity}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${getStatusClass(bug.status)}`}>
+                        {bug.status}
+                      </span>
+                    </td>
+                    <td>{bug.reportedBy?.name || 'Unknown'}</td>
+                    <td>{new Date(bug.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

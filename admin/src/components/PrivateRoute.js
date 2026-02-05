@@ -1,24 +1,17 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const PrivateRoute = ({ children }) => {
-  const { admin, loading } = useAuth();
+  // Check if user is authenticated (simple localStorage check)
+  const isAuthenticated = localStorage.getItem('adminToken');
 
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <div className="spinner">Loading...</div>
-      </div>
-    );
+  if (!isAuthenticated) {
+    // Redirect to login if not authenticated
+    return <Navigate to="/admin/login" replace />;
   }
 
-  return admin ? children : <Navigate to="/login" replace />;
+  // Render children if authenticated
+  return children;
 };
 
 export default PrivateRoute;

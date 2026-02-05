@@ -1,91 +1,130 @@
-import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Layout.css';
 
 const Layout = ({ children }) => {
-  const { admin, logout } = useAuth();
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const menuItems = [
+    {
+      path: '/admin/dashboard',
+      icon: '📊',
+      label: 'Dashboard',
+      badge: null
+    },
+    {
+      path: '/admin/bug-list',
+      icon: '🐛',
+      label: 'Bug Reports',
+      badge: null
+    },
+    {
+      path: '/admin/create-bug',
+      icon: '➕',
+      label: 'Create Bug',
+      badge: null
+    },
+    {
+      path: '/admin/settings',
+      icon: '⚙️',
+      label: 'Settings',
+      badge: null
+    }
+  ];
 
   const isActive = (path) => {
-    return location.pathname === path ? 'active' : '';
+    return location.pathname === path || location.pathname.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    // Clear authentication
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    // Redirect to login
+    navigate('/admin/login');
   };
 
   return (
-    <div className="layout">
+    <div className="layout-container">
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h2>🐛 Bug Reporter</h2>
-          <p className="sidebar-subtitle">Admin Panel</p>
+          <div className="logo">
+            <span className="logo-icon">🐛</span>
+            {sidebarOpen && <span className="logo-text">Bug Tracker</span>}
+          </div>
         </div>
 
         <nav className="sidebar-nav">
-          <Link to="/" className={`nav-item ${isActive('/')}`}>
-            <span className="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </Link>
-
-          <Link to="/bugs" className={`nav-item ${isActive('/bugs')}`}>
-            <span className="nav-icon">🐛</span>
-            <span>All Bugs</span>
-          </Link>
-
-          <Link to="/bugs/create" className={`nav-item ${isActive('/bugs/create')}`}>
-            <span className="nav-icon">➕</span>
-            <span>Create Bug</span>
-          </Link>
-
-          <Link to="/admins" className={`nav-item ${isActive('/admins')}`}>
-            <span className="nav-icon">👥</span>
-            <span>Admins</span>
-          </Link>
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              {sidebarOpen && (
+                <>
+                  <span className="nav-label">{item.label}</span>
+                  {item.badge && (
+                    <span className="nav-badge">{item.badge}</span>
+                  )}
+                </>
+              )}
+            </Link>
+          ))}
         </nav>
 
         <div className="sidebar-footer">
-          <div className="admin-info">
-            <div className="admin-avatar">
-              {admin?.name?.charAt(0).toUpperCase()}
-            </div>
-            <div className="admin-details">
-              <p className="admin-name">{admin?.name}</p>
-              <p className="admin-role">{admin?.role}</p>
-            </div>
+          <div className="user-info">
+            <div className="user-avatar">K</div>
+            {sidebarOpen && (
+              <div className="user-details">
+                <div className="user-name">Kawander</div>
+                <div className="user-role">Developer</div>
+              </div>
+            )}
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
+          <button onClick={handleLogout} className="logout-btn">
+            {sidebarOpen ? '🚪 Logout' : '🚪'}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="main-content">
-        <header className="header">
-          <div className="header-left">
-            <h1 className="page-title">
-              {location.pathname === '/' && 'Dashboard'}
-              {location.pathname === '/bugs' && 'All Bugs'}
-              {location.pathname === '/bugs/create' && 'Create New Bug'}
-              {location.pathname === '/admins' && 'Admin Management'}
-              {location.pathname.startsWith('/bugs/') && 
-               location.pathname !== '/bugs/create' && 'Bug Details'}
-            </h1>
+      <div className="main-wrapper">
+        {/* Header */}
+        <header className="main-header">
+          <button 
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+
+          <div className="header-title">
+            <h2>Bug Reporting System</h2>
+            <p className="header-subtitle">TelexPH - WanderWave Project</p>
           </div>
-          <div className="header-right">
-            <span className="welcome-text">Welcome, {admin?.name}</span>
+
+          <div className="header-actions">
+            <button className="header-btn notification-btn">
+              🔔
+              <span className="notification-badge">3</span>
+            </button>
+            <button className="header-btn sync-btn">
+              🔄 Sync Emails
+            </button>
           </div>
         </header>
 
-        <div className="content">
+        {/* Content Area */}
+        <main className="main-content">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
