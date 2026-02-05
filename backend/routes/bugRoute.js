@@ -2,6 +2,96 @@ const express = require('express');
 const router = express.Router();
 const Bug = require('../models/bug');
 const { auth } = require('../middleware/auth');
+const { fetchBugReportsFromOutlook, markEmailAsRead } = require('../services/graphService');
+const { parseEmailToBug } = require('../utils/emailParser');
+
+// @route   POST /api/bugs/sync
+// @desc    Sync bug reports from Outlook
+// @access  Private (Admin only)
+router.post('/sync', auth, async (req, res) => {
+  try {
+    console.log('Starting Outlook sync...');
+    
+    // Fetch emails from Outlook
+    const emails = await fetchBugReportsFromOutlook();
+    console.log(`Found ${emails.length} bug report emails`);
+    
+    const newBugs = [];
+    const existingBugs = [];
+    const errors = [];
+    
+    for (const email of emails) {
+      try {
+        // Check if bug already exists (by emailId)
+        const existingBug = await Bug.findOne({ emailId: email.id });
+        
+        if (existingBug) {
+          existingBugs.push(existingBug);
+          continue;
+        }
+        
+        // Parse email to bug format
+        const bugData = parseEmailToBug(email);
+        
+        // Create new bug
+        const bug = new Bug(bugData);
+        await bug.save();
+        
+        newBugs.push(bug);
+        
+        // Mark email as read (optional)
+        // await markEmailAsRead(email.id);
+        
+      } catch (error) {
+        console.error(`Error processing email ${email.id}:`, error);
+        errors.push({
+          emailId: email.id,
+          subject: email.subject,
+          error: error.message
+        });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `Successfully synced ${newBugs.length} new bug reports`,
+      summary: {
+        totalEmails: emails.length,
+        newBugs: newBugs.length,
+        existingBugs: existingBugs.length,
+        errors: errors.length
+      },
+      newBugs: newBugs,
+      errors: errors
+    });
+    
+  } catch (error) {
+    console.error('Sync error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to sync bug reports from Outlook',
+      error: error.message 
+    });
+  }
+});
+
+// @route   GET /api/bugs/pending
+// @desc    Get pending/open bugs (for modal)
+// @access  Private
+router.get('/pending', auth, async (req, res) => {
+  try {
+    const pendingBugs = await Bug.find({ 
+      status: { $in: ['Open', 'Reopened'] }
+    })
+    .sort({ createdAt: -1 })
+    .limit(50);
+    
+    res.json(pendingBugs);
+  } catch (error) {
+    console.error('Get pending bugs error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 // @route   GET /api/bugs
 // @desc    Get all bugs with filters
@@ -147,6 +237,50 @@ router.post('/', auth, async (req, res) => {
     });
   } catch (error) {
     console.error('Create bug error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// @route   PATCH /api/bugs/:id/confirm
+// @desc    Confirm/update bug (for email sync workflow)
+// @access  Private
+router.patch('/:id/confirm', auth, async (req, res) => {
+  try {
+    const { status, priority, severity, notes, assignedTo } = req.body;
+    
+    const bug = await Bug.findById(req.params.id);
+    
+    if (!bug) {
+      return res.status(404).json({ message: 'Bug not found' });
+    }
+    
+    // Update fields
+    if (status) bug.status = status;
+    if (priority) bug.priority = priority;
+    if (severity) bug.severity = severity;
+    if (assignedTo) bug.assignedTo = assignedTo;
+    
+    // Add confirmation note
+    if (notes) {
+      bug.comments.push({
+        authorName: req.admin.name,
+        author: req.admin._id,
+        message: `Confirmed: ${notes}`,
+        createdAt: new Date()
+      });
+    }
+    
+    await bug.save();
+    
+    const updatedBug = await Bug.findById(bug._id)
+      .populate('assignedTo', 'name email role');
+    
+    res.json({
+      message: 'Bug confirmed successfully',
+      bug: updatedBug
+    });
+  } catch (error) {
+    console.error('Confirm bug error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
