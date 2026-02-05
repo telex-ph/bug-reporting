@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import './Dashboard.css';
+import BugReportModal from '../../components/BugReportModal';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentBugs, setRecentBugs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -17,11 +19,11 @@ const Dashboard = () => {
       setLoading(true);
       
       // Fetch statistics
-      const statsResponse = await axios.get('/api/bugs/stats');
+      const statsResponse = await api.get('/bugs/stats');
       setStats(statsResponse.data);
 
       // Fetch recent bugs
-      const bugsResponse = await axios.get('/api/bugs?limit=5&sortBy=createdAt&sortOrder=desc');
+      const bugsResponse = await api.get('/bugs?limit=5&sortBy=createdAt&sortOrder=desc');
       setRecentBugs(bugsResponse.data.bugs);
       
       setLoading(false);
@@ -29,6 +31,15 @@ const Dashboard = () => {
       console.error('Error fetching dashboard data:', error);
       setLoading(false);
     }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleModalConfirm = () => {
+    // Refresh dashboard data after confirming a bug
+    fetchDashboardData();
   };
 
   const getSeverityClass = (severity) => {
@@ -63,6 +74,30 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
+      {/* Header with Bug Report Button */}
+      <div className="dashboard-header">
+        <h1>Dashboard Overview</h1>
+        <button 
+          onClick={() => setIsModalOpen(true)} 
+          className="btn-primary"
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#A10000',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          📧 View Bug Reports from Outlook
+        </button>
+      </div>
+
       {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
@@ -204,6 +239,13 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Bug Report Modal */}
+      <BugReportModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onConfirm={handleModalConfirm}
+      />
     </div>
   );
 };

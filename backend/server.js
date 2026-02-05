@@ -26,9 +26,12 @@ mongoose.connect(process.env.MONGODB_URI, {
     process.exit(1);
   });
 
+const bugRoutes = require('./routes/bugRoute');
+
 // Routes
 app.use('/api/auth', require('./routes/authRoute'));
 app.use('/api/admin', require('./routes/adminRoute'));
+app.use('/api/bugs', bugRoutes);
 
 // Uncomment when you create bugRoute.js
 // app.use('/api/bugs', require('./routes/bugRoute'));

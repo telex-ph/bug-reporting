@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const bugSchema = new mongoose.Schema({
+  emailId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow bugs created manually without emailId
+    index: true
+  },
   title: {
     type: String,
     required: true,
@@ -80,6 +86,10 @@ const bugSchema = new mongoose.Schema({
   closedAt: {
     type: Date,
     default: null
+  },
+  receivedDateTime: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
@@ -90,5 +100,6 @@ bugSchema.index({ status: 1 });
 bugSchema.index({ severity: 1 });
 bugSchema.index({ priority: 1 });
 bugSchema.index({ createdAt: -1 });
+bugSchema.index({ emailId: 1 });
 
 module.exports = mongoose.model('Bug', bugSchema);
