@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Layout.css';
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [adminData, setAdminData] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Load admin data from localStorage
+  useEffect(() => {
+    const storedAdminData = localStorage.getItem('adminData');
+    if (storedAdminData) {
+      try {
+        setAdminData(JSON.parse(storedAdminData));
+      } catch (error) {
+        console.error('Error parsing admin data:', error);
+      }
+    }
+  }, []);
 
   const menuItems = [
     {
@@ -42,8 +55,20 @@ const Layout = ({ children }) => {
     // Clear authentication
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
+    localStorage.removeItem('rememberMe');
+    
     // Redirect to login
     navigate('/admin/login');
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!adminData || !adminData.name) return 'A';
+    const names = adminData.name.split(' ');
+    if (names.length >= 2) {
+      return names[0][0] + names[1][0];
+    }
+    return names[0][0];
   };
 
   return (
@@ -79,11 +104,25 @@ const Layout = ({ children }) => {
 
         <div className="sidebar-footer">
           <div className="user-info">
-            <div className="user-avatar">K</div>
+            <div className="user-avatar">
+              {adminData?.profilePicture ? (
+                <img 
+                  src={adminData.profilePicture} 
+                  alt={adminData.name} 
+                  className="avatar-img"
+                />
+              ) : (
+                getUserInitials()
+              )}
+            </div>
             {sidebarOpen && (
               <div className="user-details">
-                <div className="user-name">Kawander</div>
-                <div className="user-role">Developer</div>
+                <div className="user-name">
+                  {adminData?.name || 'Admin'}
+                </div>
+                <div className="user-role">
+                  {adminData?.role || 'User'}
+                </div>
               </div>
             )}
           </div>

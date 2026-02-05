@@ -5,6 +5,7 @@ import { BsCheckCircleFill } from 'react-icons/bs';
 import { AiFillThunderbolt } from 'react-icons/ai';
 import './Login.css';
 import BugCircleLogo from '../../assets/TexionixLogo.png';
+import { authAPI } from '../../services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,25 +20,56 @@ const Login = () => {
     setError('');
     setLoading(true);
 
+    // Validation
     if (!email || !password) {
       setError('Please enter email and password');
       setLoading(false);
       return;
     }
 
-    if (email === 'admin@telexph.com' && password === 'admin123') {
-      localStorage.setItem('adminToken', 'demo-token-12345');
-      localStorage.setItem('adminData', JSON.stringify({
-        email: email,
-        name: 'Kawander',
-        role: 'Developer'
-      }));
-      navigate('/admin/dashboard');
-    } else {
-      setError('Invalid email or password');
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    try {
+      // Call login API
+      const response = await authAPI.login(email, password);
+      
+      // Store token and admin data
+      localStorage.setItem('adminToken', response.token);
+      localStorage.setItem('adminData', JSON.stringify(response.admin));
+      
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+      }
+
+      // Success message (optional)
+      console.log('Login successful:', response.message);
+      
+      // Navigate to dashboard
+      navigate('/admin/dashboard');
+      
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      // Handle specific error messages from backend
+      if (err.message) {
+        setError(err.message);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Login failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -179,6 +211,10 @@ const Login = () => {
                 )}
               </button>
             </form>
+
+            <div className="login-footer">
+              <p>Need Help? <a href="#support">Contact Support</a></p>
+            </div>
           </div>
         </div>
       </div>
