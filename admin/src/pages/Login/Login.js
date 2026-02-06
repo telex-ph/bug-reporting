@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiMail, HiLockClosed, HiExclamationCircle } from 'react-icons/hi';
-import { BsCheckCircleFill } from 'react-icons/bs';
-import { AiFillThunderbolt } from 'react-icons/ai';
 import './Login.css';
 import BugCircleLogo from '../../assets/TexionixLogo.png';
 import { authAPI } from '../../services/api';
@@ -15,19 +13,18 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
+  // Tinanggal na natin ang slide state at interval logic dito
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    // Validation
     if (!email || !password) {
       setError('Please enter email and password');
       setLoading(false);
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
@@ -36,30 +33,24 @@ const Login = () => {
     }
 
     try {
-      // Call login API
       const response = await authAPI.login(email, password);
       
-      // Store token and admin data
       localStorage.setItem('adminToken', response.token);
       localStorage.setItem('adminData', JSON.stringify(response.admin));
       
-      // Store remember me preference
       if (rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       } else {
         localStorage.removeItem('rememberMe');
       }
 
-      // Success message (optional)
       console.log('Login successful:', response.message);
       
-      // Navigate to dashboard
       navigate('/admin/dashboard');
       
     } catch (err) {
       console.error('Login error:', err);
       
-      // Handle specific error messages from backend
       if (err.message) {
         setError(err.message);
       } else if (err.response?.data?.message) {
@@ -74,7 +65,6 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      {/* Animated Background Shapes */}
       <div className="bg-shapes">
         <div className="shape shape-1"></div>
         <div className="shape shape-2"></div>
@@ -82,52 +72,33 @@ const Login = () => {
       </div>
 
       <div className="login-card-wrapper">
-        {/* Left Side - Branding Text Only */}
         <div className="login-left">
-          <div className="brand-content">
-            <div className="branding-text">
-              <h1 className="system-title">Bug Reporting System</h1>
-              <p className="system-tagline">Audit & Compliance Division</p>
-            </div>
+          {/* Isang video na lang ang ititira natin dito na naka-point sa video2.mp4 */}
+          <video
+            className="slideshow-video active"
+            src="/uploads/video2.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+          
+          {/* Image replacing the H1 text */}
+<div className="slide-text-overlay">
+  <img
+    src="/logo.png"
+    alt="Texionix"
+    className="slide-title-image"
+  />
+  <p className="slide-subtitle"></p>
+</div>
 
-            <h3 className="welcome-text">Welcome Back, Admin!</h3>
-            <p className="welcome-subtitle">
-              Manage bug reports efficiently with real-time tracking and comprehensive analytics.
-            </p>
 
-            <div className="features-list">
-              <div className="feature-item">
-                <span className="check-icon">
-                  <BsCheckCircleFill size={20} />
-                </span>
-                <span>Real-time bug tracking</span>
-              </div>
-              <div className="feature-item">
-                <span className="check-icon">
-                  <BsCheckCircleFill size={20} />
-                </span>
-                <span>Email integration</span>
-              </div>
-              <div className="feature-item">
-                <span className="check-icon">
-                  <BsCheckCircleFill size={20} />
-                </span>
-                <span>Team collaboration</span>
-              </div>
-              <div className="feature-item">
-                <span className="check-icon">
-                  <BsCheckCircleFill size={20} />
-                </span>
-                <span>Priority management</span>
-              </div>
-            </div>
-          </div>
+          {/* Tinanggal na rin ang slideshow-indicators dahil hindi na ito slide */}
         </div>
 
-        {/* Right Side - Login Form with Circle Logo */}
         <div className="login-right">
           <div className="login-form-container">
-            {/* Circle Bug Logo at Top */}
             <div className="logo-container">
               <img 
                 src={BugCircleLogo} 
@@ -204,10 +175,7 @@ const Login = () => {
                     Logging in...
                   </>
                 ) : (
-                  <>
-                    Login to Dashboard
-                    <AiFillThunderbolt size={18} />
-                  </>
+                  'Login'
                 )}
               </button>
             </form>

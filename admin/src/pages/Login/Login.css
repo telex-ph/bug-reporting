@@ -10,7 +10,7 @@
 .login-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #530607 0%, #282828 100%);
+  background: linear-gradient(135deg, #A10000 0%, #FFFFFF 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,117 +84,100 @@
   z-index: 1;
 }
 
-/* ========== LEFT SIDE - BRANDING TEXT ========== */
+/* ========== LEFT SIDE - IMAGE SLIDESHOW ========== */
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, rgba(161, 0, 0, 0.08) 0%, rgba(40, 40, 40, 0.12) 100%),
-              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(161,0,0,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-  background-color: #F8F9FA;
-  background-size: cover, 50px 50px;
-  padding: 4rem 3rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
 }
 
-.login-left::before {
-  content: '';
+/* Slideshow Background Videos */
+.slideshow-video {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(161, 0, 0, 0.04) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(161, 0, 0, 0.03) 0%, transparent 50%);
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  z-index: 0;
 }
 
-.brand-content {
-  color: #282828;
-  position: relative;
+.slideshow-video.active {
+  opacity: 1;
+}
+
+/* Dark Overlay for Text Readability */
+.slideshow-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
   z-index: 1;
 }
 
-/* ========== BRANDING TEXT ========== */
-.branding-text {
-  text-align: center;
-  margin-bottom: 3.5rem;
-  padding-bottom: 2.5rem;
-  border-bottom: 2px solid rgba(161, 0, 0, 0.2);
-}
-
-.system-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 900;
-  font-size: 2.2rem;
-  color: #282828;
-  margin-bottom: 0.875rem;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.system-tagline {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 0.85rem;
-  color: #A10000;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  font-weight: 700;
-}
-
-/* ========== WELCOME TEXT ========== */
-.welcome-text {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 900;
-  font-size: 1.75rem;
-  margin-bottom: 0.875rem;
-  line-height: 1.3;
-  color: #282828;
-  text-align: center;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.welcome-subtitle {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #4B5563;
+/* ========== SLIDE TEXT OVERLAY ========== */
+.slide-text-overlay {
+  position: relative;
+  z-index: 2;
+  color: #FFFFFF;
   margin-bottom: 3rem;
-  text-align: center;
-  font-weight: 500;
 }
 
-/* ========== FEATURES LIST ========== */
-.features-list {
+.slide-title-image {
+  /* Gawin kasing taas at lapad ng dati H1 */
+  height: 3rem;          /* adjust depende sa H1 size mo */
+  width: auto;           /* maintain aspect ratio */
+  display: block;
+  margin-bottom: 0;      /* kung gusto mo controlled ng parent */
+}
+ 
+
+
+
+/* ========== SLIDESHOW INDICATORS (NAVIGATION DOTS) ========== */
+.slideshow-indicators {
+  position: absolute;
+  bottom: 2rem;
+  left: 3rem;
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 0 1rem;
+  gap: 0.5rem;
+  z-index: 2;
 }
 
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 600;
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
 }
 
-.check-icon {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #A10000;
-  filter: drop-shadow(0 1px 2px rgba(161, 0, 0, 0.2));
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.indicator.active {
+  width: 24px;
+  border-radius: 4px;
+  background: #FCA5A5;
+  box-shadow: 0 0 8px rgba(252, 165, 165, 0.6);
 }
 
 /* ========== RIGHT SIDE - LOGIN FORM ========== */
@@ -212,7 +195,7 @@
   max-width: 420px;
 }
 
-/* ========== CIRCLE BUG LOGO - TOP ========== */
+/* ========== CIRCLE BUG LOGO ========== */
 .logo-container {
   display: flex;
   align-items: center;
@@ -424,6 +407,7 @@
   text-align: center;
   margin-top: 2rem;
   padding-top: 2rem;
+  padding-bottom: 0.5rem;
   border-top: 1px solid #E5E7EB;
   font-family: 'Open Sans', sans-serif;
   font-size: 0.85rem;
@@ -441,104 +425,35 @@
   text-decoration: underline;
 }
 
-.demo-badge {
-  margin-top: 1.75rem;
-  padding: 1.25rem;
-  background: #FAFAFA;
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
-  text-align: center;
-}
+/* ========== RESPONSIVE BREAKPOINTS ========== */
 
-.demo-badge p {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0.375rem 0;
-  font-size: 0.85rem;
-  color: #374151;
-  font-weight: 600;
-}
-
-.demo-badge strong {
-  color: #282828;
-  font-weight: 800;
-}
-
-.demo-email, .demo-pass {
-  font-family: 'Courier New', 'Monaco', monospace;
-  background: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  display: inline-block;
-  margin: 0.375rem 0.25rem 0 0.25rem;
-  border: 1px solid #D1D5DB;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #374151;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 968px) {
-  .login-page {
-    padding: 1.5rem;
-  }
-
+/* ========== LARGE DESKTOP (1200px and above) ========== */
+@media (min-width: 1200px) {
   .login-card-wrapper {
-    flex-direction: column;
-    max-width: 520px;
+    max-width: 1100px;
+    height: 650px;
   }
 
   .login-left {
-    padding: 3rem 2.5rem;
+    padding: 4rem;
   }
 
-  .system-title {
-    font-size: 1.9rem;
+  .slide-title {
+    font-size: 2rem;
   }
 
-  .welcome-text {
-    font-size: 1.5rem;
+  .slide-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
   }
 
-  .login-right {
-    padding: 3rem 2.5rem;
-  }
-
-  .circle-bug-logo {
-    width: 100px;
-    height: 100px;
-  }
-}
-
-@media (max-width: 640px) {
-  .login-page {
-    padding: 1rem;
-  }
-
-  .login-card-wrapper {
-    border-radius: 16px;
-    max-width: 100%;
-  }
-
-  .login-left {
-    padding: 2.5rem 2rem;
-  }
-
-  .system-title {
-    font-size: 1.6rem;
-  }
-
-  .welcome-text {
-    font-size: 1.35rem;
-  }
-
-  .features-list {
-    padding: 0 0.5rem;
-    gap: 1rem;
+  .slideshow-indicators {
+    bottom: 2.5rem;
+    left: 4rem;
   }
 
   .login-right {
-    padding: 2.5rem 2rem;
+    padding: 4.5rem 4rem;
   }
 
   .circle-bug-logo {
@@ -546,9 +461,761 @@
     height: 90px;
   }
 
+  .login-form-header h2 {
+    font-size: 2rem;
+  }
+}
+
+/* ========== DESKTOP/LAPTOP (969px - 1199px) ========== */
+@media (min-width: 969px) and (max-width: 1199px) {
+  .login-card-wrapper {
+    max-width: 950px;
+  }
+}
+
+/* ========== IPAD PRO 12.9" PORTRAIT (1024px × 1366px) ========== */
+@media (min-width: 1024px) and (max-width: 1024px) and (orientation: portrait) {
+  .login-page {
+    padding: 2rem;
+  }
+
+  .login-card-wrapper {
+    flex-direction: row;
+    max-width: 920px;
+    height: auto;
+    min-height: 700px;
+  }
+
+  .login-left {
+    flex: 1;
+    padding: 3.5rem 2.5rem;
+    min-height: 700px;
+    display: flex;
+  }
+
+  .slide-title {
+    font-size: 1.85rem;
+  }
+
+  .slide-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+  }
+
+  .slideshow-indicators {
+    bottom: 2rem;
+    left: 2.5rem;
+  }
+
+  .login-right {
+    flex: 1;
+    padding: 3.5rem 3rem;
+  }
+
+  .circle-bug-logo {
+    width: 75px;
+    height: 75px;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.9rem;
+  }
+
+  .login-form {
+    gap: 1.4rem;
+  }
+}
+
+/* ========== IPAD PRO 12.9" LANDSCAPE (1366px × 1024px) ========== */
+@media (min-width: 1280px) and (max-width: 1366px) and (orientation: landscape) and (max-height: 1024px) {
+  .login-page {
+    padding: 2rem;
+  }
+
+  .login-card-wrapper {
+    flex-direction: row;
+    max-width: 1100px;
+    height: auto;
+    min-height: 650px;
+    max-height: 850px;
+  }
+
+  .login-left {
+    flex: 1;
+    padding: 3.5rem 2.5rem;
+    min-height: 650px;
+    display: flex;
+  }
+
+  .slide-title {
+    font-size: 1.95rem;
+  }
+
+  .slide-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 1.8px;
+  }
+
+  .slideshow-indicators {
+    bottom: 2.25rem;
+    left: 2.5rem;
+  }
+
+  .login-right {
+    flex: 1;
+    padding: 4rem 3.5rem;
+  }
+
+  .circle-bug-logo {
+    width: 85px;
+    height: 85px;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.95rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.95rem;
+  }
+}
+
+/* ========== TABLET LANDSCAPE & SURFACE PRO 7 (769px - 968px) ========== */
+/* iPad Air, Surface Pro 7 */
+@media (max-width: 968px) and (min-width: 769px) {
+  .login-page {
+    padding: 1.5rem;
+  }
+
+  .login-card-wrapper {
+    flex-direction: column;
+    max-width: 600px;
+    height: auto;
+    min-height: 650px;
+  }
+
+  .login-left {
+    padding: 2.5rem 2rem;
+    min-height: 350px;
+  }
+
+  .slide-title {
+    font-size: 1.6rem;
+  }
+
+  .slide-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 1.3px;
+  }
+
+  .slideshow-indicators {
+    bottom: 1.5rem;
+    left: 2rem;
+  }
+
+  .login-right {
+    padding: 3rem 2.5rem;
+  }
+
+  .circle-bug-logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.75rem;
+  }
+}
+
+/* ========== TABLET PORTRAIT & FOLDABLES UNFOLDED (641px - 768px) ========== */
+/* iPad Mini, Surface Duo (unfolded), Galaxy Z Fold 5 (unfolded) */
+@media (max-width: 768px) and (min-width: 641px) {
+  .login-page {
+    padding: 1.5rem;
+  }
+
+  .login-card-wrapper {
+    flex-direction: column;
+    max-width: 520px;
+    height: auto;
+    min-height: 600px;
+  }
+
+  .login-left {
+    padding: 2.5rem 2rem;
+    min-height: 320px;
+  }
+
+  .slide-title {
+    font-size: 1.5rem;
+  }
+
+  .slide-subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+  }
+
+  .slideshow-indicators {
+    bottom: 1.5rem;
+    left: 2rem;
+  }
+
+  .login-right {
+    padding: 2.5rem 2rem;
+  }
+
+  .circle-bug-logo {
+    width: 65px;
+    height: 65px;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.65rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.85rem;
+  }
+}
+
+/* ========== LARGE PHONES & FOLDABLES FOLDED (541px - 640px) ========== */
+/* iPhone 14 Pro Max, Pixel 7, Samsung Galaxy S20 Ultra, Galaxy Z Fold 5 (folded) */
+@media (max-width: 640px) and (min-width: 541px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .login-card-wrapper {
+    border-radius: 16px;
+    max-width: 100%;
+    min-height: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* Hide video section on mobile phones */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 2.5rem 2rem;
+    width: 100%;
+  }
+
+  .circle-bug-logo {
+    width: 65px;
+    height: 65px;
+  }
+
+  .login-form-header {
+    margin-bottom: 2rem;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.85rem;
+  }
+
+  .login-form {
+    gap: 1.25rem;
+  }
+
+  .form-group input {
+    padding: 0.95rem 0.95rem 0.95rem 2.85rem;
+    font-size: 0.95rem;
+  }
+
+  .input-icon {
+    left: 0.95rem;
+  }
+
+  .form-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .login-submit-btn {
+    padding: 1.05rem;
+    font-size: 0.9rem;
+  }
+
+  .login-footer {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+  }
+}
+
+/* ========== STANDARD PHONES (415px - 540px) ========== */
+/* iPhone XR, iPhone 12 Pro, Samsung Galaxy A51/71, Samsung Galaxy S8+ */
+@media (max-width: 540px) and (min-width: 415px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .login-card-wrapper {
+    border-radius: 14px;
+    max-width: 100%;
+    min-height: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* Hide video section on mobile phones */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 2.25rem 1.75rem;
+    width: 100%;
+  }
+
+  .circle-bug-logo {
+    width: 62px;
+    height: 62px;
+  }
+
+  .login-form-header {
+    margin-bottom: 1.85rem;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.825rem;
+  }
+
+  .login-form {
+    gap: 1.15rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-group input {
+    padding: 0.9rem 0.9rem 0.9rem 2.75rem;
+    font-size: 0.9rem;
+  }
+
+  .input-icon {
+    left: 0.9rem;
+  }
+
   .form-options {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.875rem;
+    gap: 0.85rem;
+  }
+
+  .checkbox-label,
+  .forgot-link {
+    font-size: 0.825rem;
+  }
+
+  .login-submit-btn {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .login-footer {
+    margin-top: 1.65rem;
+    padding-top: 1.65rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ========== SMALL PHONES (376px - 414px) ========== */
+/* iPhone SE (3rd gen), Standard portrait phones */
+@media (max-width: 414px) and (min-width: 376px) {
+  .login-page {
+    padding: 0.85rem;
+  }
+
+  .login-card-wrapper {
+    border-radius: 14px;
+    max-width: 100%;
+    min-height: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* Hide video section on mobile phones */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 2rem 1.5rem;
+    width: 100%;
+  }
+
+  .circle-bug-logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .login-form-header {
+    margin-bottom: 1.75rem;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.45rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.8rem;
+  }
+
+  .login-form {
+    gap: 1.1rem;
+  }
+
+  .form-group label {
+    font-size: 0.825rem;
+  }
+
+  .form-group input {
+    padding: 0.875rem 0.875rem 0.875rem 2.65rem;
+    font-size: 0.875rem;
+  }
+
+  .input-icon {
+    left: 0.875rem;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .checkbox-label,
+  .forgot-link {
+    font-size: 0.8rem;
+  }
+
+  .login-submit-btn {
+    padding: 0.95rem;
+    font-size: 0.85rem;
+  }
+
+  .login-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    font-size: 0.775rem;
+  }
+}
+
+/* ========== EXTRA SMALL PHONES (320px - 375px) ========== */
+/* iPhone SE (1st/2nd gen), older/smaller devices */
+@media (max-width: 375px) {
+  .login-page {
+    padding: 0.75rem;
+  }
+
+  .login-card-wrapper {
+    border-radius: 12px;
+    max-width: 100%;
+    min-height: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* Hide video section on mobile phones */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 1.75rem 1.25rem;
+    width: 100%;
+  }
+
+  .circle-bug-logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .login-form-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.75rem;
+  }
+
+  .login-form {
+    gap: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .form-group input {
+    padding: 0.85rem 0.85rem 0.85rem 2.5rem;
+    font-size: 0.85rem;
+  }
+
+  .input-icon {
+    left: 0.85rem;
+  }
+
+  .input-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .checkbox-label,
+  .forgot-link {
+    font-size: 0.775rem;
+  }
+
+  .login-submit-btn {
+    padding: 0.9rem;
+    font-size: 0.825rem;
+    letter-spacing: 0.5px;
+  }
+
+  .login-footer {
+    margin-top: 1.35rem;
+    padding-top: 1.35rem;
+    font-size: 0.75rem;
+  }
+
+  .error-message {
+    padding: 0.75rem 0.95rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ========== LANDSCAPE ORIENTATION (Mobile/Tablet) ========== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .login-page {
+    padding: 0.5rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .login-card-wrapper {
+    margin: 0.5rem auto;
+    min-height: auto;
+    height: auto;
+    max-height: none;
+  }
+
+  /* Hide video section in landscape mobile */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 1.5rem 2rem;
+  }
+
+  .circle-bug-logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .login-form-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.75rem;
+  }
+
+  .login-form {
+    gap: 0.85rem;
+  }
+
+  .form-group input {
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  }
+
+  .login-submit-btn {
+    padding: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .login-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+}
+
+/* ========== FOLDABLE DEVICES SPECIFIC ========== */
+/* Surface Duo - Portrait (540px width when folded) */
+@media (max-width: 540px) and (min-width: 520px) {
+  .login-card-wrapper {
+    max-width: 95%;
+  }
+
+  /* Hide video section on foldable devices in folded state */
+  .login-left {
+    display: none;
+  }
+}
+
+/* Galaxy Z Fold 5 - Folded (344px width) */
+@media (max-width: 344px) {
+  .login-page {
+    padding: 0.5rem;
+  }
+
+  .login-card-wrapper {
+    height: auto;
+  }
+
+  /* Hide video section on foldable devices */
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: 1.5rem 1rem;
+  }
+
+  .circle-bug-logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .login-form-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .login-form-header p {
+    font-size: 0.7rem;
+  }
+
+  .form-group input {
+    padding: 0.8rem 0.8rem 0.8rem 2.4rem;
+    font-size: 0.825rem;
+  }
+}
+
+/* ========== LARGE DISPLAYS (Nest Hub, Nest Hub Max, Asus Zenbook Fold) ========== */
+@media (min-width: 1024px) and (max-width: 1280px) and (orientation: landscape) and (min-height: 600px) {
+  .login-card-wrapper {
+    max-width: 900px;
+  }
+
+  .login-left {
+    padding: 3.5rem 2.5rem;
+  }
+
+  .login-right {
+    padding: 3.5rem 2.5rem;
+  }
+}
+
+/* Nest Hub (1024x600) */
+@media (width: 1024px) and (height: 600px) {
+  .login-card-wrapper {
+    height: auto;
+    max-height: 520px;
+  }
+
+  .login-left {
+    min-height: 280px;
+  }
+}
+
+/* Nest Hub Max (1280x800) */
+@media (min-width: 1280px) and (max-height: 800px) {
+  .login-card-wrapper {
+    max-width: 1000px;
+    height: auto;
+    max-height: 650px;
+  }
+}
+
+/* ========== TOUCH DEVICE OPTIMIZATIONS ========== */
+@media (pointer: coarse) {
+  .login-submit-btn,
+  .forgot-link,
+  .login-footer a,
+  .checkbox-label,
+  .indicator {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .forgot-link,
+  .login-footer a,
+  .checkbox-label {
+    min-width: auto;
+    padding: 0.5rem;
+  }
+
+  .form-group input {
+    min-height: 48px;
+  }
+}
+
+/* ========== HIGH DPI DISPLAYS ========== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .circle-bug-logo {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* ========== REDUCED MOTION ========== */
+@media (prefers-reduced-motion: reduce) {
+  .shape,
+  .slideshow-video,
+  .circle-bug-logo,
+  .login-submit-btn,
+  .indicator {
+    animation: none;
+    transition: none;
+  }
+  
+  .slideshow-video {
+    animation-play-state: paused;
+  }
+}
+
+/* ========== DARK MODE SUPPORT (Optional) ========== */
+@media (prefers-color-scheme: dark) {
+  .login-page {
+    background: linear-gradient(135deg, #3d0000 0%, #1a1a1a 100%);
   }
 }
