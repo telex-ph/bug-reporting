@@ -2,11 +2,25 @@
  * Parse Outlook email to Bug model format
  * Email subject format: [BUG REPORT] [SEVERITY] - Title
  * Example: [BUG REPORT] [HIGH] – Promo Code Can Be Applied to All Packages Without Restriction
+ * 
+ * ✅ UPDATED: Now uses uniqueBody to get ONLY the first email content, not the entire thread
  */
 
 function parseEmailToBug(email) {
   const subject = email.subject;
-  const body = email.body?.content || email.bodyPreview || '';
+  
+  // ✅ PRIORITY: Use uniqueBody first (original email only), fallback to body or bodyPreview
+  let body = '';
+  if (email.uniqueBody?.content) {
+    body = email.uniqueBody.content;
+    console.log('📧 Using uniqueBody (first email only)');
+  } else if (email.body?.content) {
+    body = email.body.content;
+    console.log('⚠️ uniqueBody not available, using full body (may include thread)');
+  } else if (email.bodyPreview) {
+    body = email.bodyPreview;
+    console.log('⚠️ Using bodyPreview as fallback');
+  }
   
   // Extract severity from subject
   let severity = 'Medium';
@@ -22,8 +36,8 @@ function parseEmailToBug(email) {
     .replace(/\[HIGH\]/gi, '')
     .replace(/\[MEDIUM\]/gi, '')
     .replace(/\[LOW\]/gi, '')
-    .replace(/–/g, '-') // Replace em dash with regular dash
-    .replace(/—/g, '-') // Replace en dash
+    .replace(/—/g, '-') // Replace em dash with regular dash
+    .replace(/–/g, '-') // Replace en dash
     .trim();
   
   // Remove leading dash if exists
@@ -78,6 +92,14 @@ function cleanHtmlFromBody(htmlContent) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
+  
+  // ✅ Remove common email reply indicators
+  text = text
+    .replace(/On .+ wrote:/gi, '')  // Remove "On [date] [person] wrote:"
+    .replace(/From:.+?Sent:.+?To:.+?Subject:.+/gi, '')  // Remove email headers
+    .replace(/_{2,}/g, '')  // Remove multiple underscores
+    .replace(/-{2,} Original Message -{2,}/gi, '')  // Remove "-- Original Message --"
+    .replace(/>{1,}.*/g, '')  // Remove quoted lines starting with >
   
   // Clean up multiple spaces and newlines
   text = text

@@ -49,20 +49,52 @@ async function fetchBugReportsFromOutlook() {
     console.log(`📧 Fetching recent emails from: ${adminEmail}`);
     
     // METHOD 1: Try using search first (more flexible)
+    // ✅ UPDATED: Now fetches uniqueBody to get ONLY the first email, not the entire thread
     try {
       console.log('Trying search method...');
       const searchResults = await client
         .api(`/users/${adminEmail}/messages`)
         .search('"BUG REPORT"')
-        .select('id,subject,bodyPreview,body,from,receivedDateTime,isRead,hasAttachments')
+        .select('id,subject,bodyPreview,body,uniqueBody,from,receivedDateTime,isRead,hasAttachments,conversationId')
+        .filter('isDraft eq false')  // ✅ Exclude drafts
         .top(50)
         .get();
       
-      const bugReports = searchResults.value.filter(msg => 
-        msg.subject && msg.subject.includes('[BUG REPORT]')
-      );
+      // ✅ Filter: Only get ORIGINAL bug reports (not replies/forwards)
+      let bugReports = searchResults.value.filter(msg => {
+        if (!msg.subject || !msg.subject.includes('[BUG REPORT]')) {
+          return false;
+        }
+        
+        // ✅ Exclude replies and forwards
+        const subject = msg.subject.toUpperCase();
+        if (subject.startsWith('RE:') || subject.startsWith('FW:') || 
+            subject.startsWith('FWD:') || subject.includes('RE: [BUG REPORT]')) {
+          console.log(`⏭️ Skipping reply/forward: ${msg.subject}`);
+          return false;
+        }
+        
+        return true;
+      });
       
-      console.log(`✓ Search method: Found ${bugReports.length} bug report emails`);
+      // ✅ Deduplicate by conversationId (keep only the FIRST email per thread)
+      const uniqueConversations = new Map();
+      bugReports.forEach(msg => {
+        const convId = msg.conversationId;
+        if (!uniqueConversations.has(convId)) {
+          uniqueConversations.set(convId, msg);
+        } else {
+          // Keep the older one (first email in thread)
+          const existing = uniqueConversations.get(convId);
+          if (new Date(msg.receivedDateTime) < new Date(existing.receivedDateTime)) {
+            uniqueConversations.set(convId, msg);
+          }
+        }
+      });
+      
+      bugReports = Array.from(uniqueConversations.values());
+      
+      console.log(`✓ Search method: Found ${bugReports.length} unique bug report emails (deduplicated)`);
       
       // Sort by date
       bugReports.sort((a, b) => 
@@ -74,21 +106,52 @@ async function fetchBugReportsFromOutlook() {
     } catch (searchError) {
       console.log('Search method failed, trying fallback method...');
       
-      // METHOD 2: Fallback - fetch all recent emails then filter
+      // METHOD 2: Fallback - fetch from inbox only (not sent items)
+      // ✅ UPDATED: Added uniqueBody and conversationId
       const messages = await client
         .api(`/users/${adminEmail}/mailFolders/inbox/messages`)
-        .select('id,subject,bodyPreview,body,from,receivedDateTime,isRead,hasAttachments')
+        .select('id,subject,bodyPreview,body,uniqueBody,from,receivedDateTime,isRead,hasAttachments,conversationId')
+        .filter('isDraft eq false')  // ✅ Exclude drafts
         .top(100)
         .get();
       
-      console.log(`✓ Fetched ${messages.value.length} recent emails`);
+      console.log(`✓ Fetched ${messages.value.length} recent emails from INBOX`);
       
-      // Filter for bug reports client-side
-      const bugReports = messages.value.filter(msg => 
-        msg.subject && msg.subject.toUpperCase().includes('[BUG REPORT]')
-      );
+      // ✅ Filter: Only get ORIGINAL bug reports (not replies/forwards)
+      let bugReports = messages.value.filter(msg => {
+        if (!msg.subject || !msg.subject.toUpperCase().includes('[BUG REPORT]')) {
+          return false;
+        }
+        
+        // ✅ Exclude replies and forwards
+        const subject = msg.subject.toUpperCase();
+        if (subject.startsWith('RE:') || subject.startsWith('FW:') || 
+            subject.startsWith('FWD:') || subject.includes('RE: [BUG REPORT]')) {
+          console.log(`⏭️ Skipping reply/forward: ${msg.subject}`);
+          return false;
+        }
+        
+        return true;
+      });
       
-      console.log(`✓ Fallback method: Found ${bugReports.length} bug report emails`);
+      // ✅ Deduplicate by conversationId (keep only the FIRST email per thread)
+      const uniqueConversations = new Map();
+      bugReports.forEach(msg => {
+        const convId = msg.conversationId;
+        if (!uniqueConversations.has(convId)) {
+          uniqueConversations.set(convId, msg);
+        } else {
+          // Keep the older one (first email in thread)
+          const existing = uniqueConversations.get(convId);
+          if (new Date(msg.receivedDateTime) < new Date(existing.receivedDateTime)) {
+            uniqueConversations.set(convId, msg);
+          }
+        }
+      });
+      
+      bugReports = Array.from(uniqueConversations.values());
+      
+      console.log(`✓ Fallback method: Found ${bugReports.length} unique bug report emails (deduplicated)`);
       
       // Sort by date
       bugReports.sort((a, b) => 
