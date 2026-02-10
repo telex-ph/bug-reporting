@@ -2,10 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-
+const http = require('http');
+const NotificationService = require('./services/notificationService');
 dotenv.config();
 
 const app = express();
+
+const server = http.createServer(app);
 
 // Middleware
 app.use(cors({
@@ -27,6 +30,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   });
 
 const bugRoutes = require('./routes/bugRoute');
+const notificationService = new NotificationService(server);
+global.notificationService = notificationService;
+const EmailMonitor = require('./services/emailMonitor');
+const emailMonitor = new EmailMonitor(notificationService);
+emailMonitor.startMonitoring(1);
 
 // Routes
 app.use('/api/auth', require('./routes/authRoute'));
@@ -64,7 +72,13 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+/*app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+});*/
+
+module.exports = app;
