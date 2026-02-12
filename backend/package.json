@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@azure/identity": "^4.13.0",
+    "@azure/msal-node": "^5.0.3",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.0",
@@ -25,7 +26,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.22.1",
     "multer": "^1.4.5-lts.1",
-    "node-cron": "^4.2.1"
+    "node-cron": "^4.2.1",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
